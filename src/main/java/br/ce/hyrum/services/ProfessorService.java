@@ -1,6 +1,7 @@
 package br.ce.hyrum.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -8,18 +9,21 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import br.ce.hyrum.dtos.aluno.AlunoResponseDto;
 import br.ce.hyrum.dtos.professor.ProfessorRequestDto;
 import br.ce.hyrum.dtos.professor.ProfessorResponseDto;
+import br.ce.hyrum.mappers.AlunoMapper;
 import br.ce.hyrum.mappers.ProfessorMapper;
+import br.ce.hyrum.models.Aluno;
 import br.ce.hyrum.models.Professor;
 import br.ce.hyrum.repositories.ProfessorRepository;
 
 @ApplicationScoped
 public class ProfessorService {
-    
+
     @Inject
     ProfessorRepository professorRepository;
-    
+
     @Transactional
     public ProfessorResponseDto save(@Valid ProfessorRequestDto professorRequestDto) {
         Professor professor = ProfessorMapper.fromProfessorRequestDto(professorRequestDto);
@@ -32,12 +36,12 @@ public class ProfessorService {
 
     @Transactional
     public ProfessorResponseDto update(Long id, ProfessorRequestDto professoreRequestDto) {
-        
+
         // Valida se os ids informados são iguais.
         if (!professoreRequestDto.getId().equals(id)) {
             throw new RuntimeException("Ids divergentes!");
         }
-        
+
         Optional<Professor> professorOptional = Professor.findByIdOptional(id);
 
         if (!professorOptional.isPresent()) {
@@ -56,7 +60,7 @@ public class ProfessorService {
 
     @Transactional
     public void delete(Long id) {
-        
+
         Optional<Professor> professorOptional = Professor.findByIdOptional(id);
 
         if (!professorOptional.isPresent()) {
@@ -67,6 +71,26 @@ public class ProfessorService {
 
         professorRepository.delete(professor);
 
+    }
+
+    public List<AlunoResponseDto> findTutorados(Long id) {
+
+        Optional<Professor> professorOptional = Professor.findByIdOptional(id);
+
+        if (!professorOptional.isPresent()) {
+            throw new RuntimeException("Professor não encontrado.");
+        }   
+
+        var professor = professorOptional.get();
+
+        return Aluno
+                .stream("tutor = ?1", professor)
+                .map(aluno -> (Aluno) aluno) 
+                .map(aluno -> { 
+                        aluno.setTutor(null);
+                        return AlunoMapper.toAlunoResponseDto(aluno);
+                }).toList();
+                
     }
 
 }

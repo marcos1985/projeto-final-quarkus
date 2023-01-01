@@ -1,6 +1,5 @@
 package br.ce.hyrum.resources;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -73,6 +72,15 @@ public class ProfessorResource {
 
         return Response
                     .ok()
+                    .build();
+    }
+
+
+    @GET
+    @Path("/{id}/tutorados")
+    public Response findTutorados(@PathParam("id") Long id) {
+        return Response.ok()
+                    .entity(professorService.findTutorados(id))
                     .build();
     }
     
