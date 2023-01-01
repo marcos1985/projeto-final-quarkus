@@ -1,6 +1,7 @@
 package br.ce.hyrum.resources;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -38,5 +39,12 @@ public class AlunoResource {
     public Response update(@PathParam("id") Long id , AlunoRequestDto alunoRequestDto) {
         return Response.ok().entity(alunoService.update(id, alunoRequestDto)).build();
     }
-    
+
+    @DELETE
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
+        alunoService.delete(id);
+        return Response.ok()
+                    .build(); 
+    }
 }

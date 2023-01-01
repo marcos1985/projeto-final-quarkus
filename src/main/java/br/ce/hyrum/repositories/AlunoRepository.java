@@ -36,4 +36,15 @@ public class AlunoRepository {
 
         return null;
     }
+
+    public void delete(Long id) {
+        
+        Optional<Aluno> optional = Aluno.findByIdOptional(id);
+
+        if (optional.isPresent()) {
+            var aluno = optional.get(); 
+            aluno.delete();
+        }
+
+    }
 }

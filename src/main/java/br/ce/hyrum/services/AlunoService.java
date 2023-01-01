@@ -37,12 +37,16 @@ public class AlunoService {
     @Transactional
     public AlunoResponseDto update(Long id, AlunoRequestDto alunoRequestDto) {
 
-        // Validação
-
         // Tranforma de DTO de request para a entidade
         Aluno aluno = AlunoMapper.fromAlunoRequestDto(alunoRequestDto);
 
         // Transforma de entidade para o DTO de response
         return AlunoMapper.toAlunoResponseDto(alunoRepository.update(id, aluno));
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        
+        alunoRepository.delete(id);
     }
 }
