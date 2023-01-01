@@ -19,13 +19,12 @@ public class AlunoMapper {
 
     public static AlunoResponseDto toAlunoResponseDto(Aluno aluno) {
         
-        var alunoResponse = new AlunoResponseDto();
-
-        alunoResponse.setId(aluno.getId());
-        alunoResponse.setNome(aluno.getNome());
-        alunoResponse.setEmail(aluno.getEmail());
-
-        return alunoResponse;
+        return AlunoResponseDto.builder()
+                .id(aluno.getId())
+                .nome(aluno.getNome())
+                .email(aluno.getEmail())
+                .tutor( aluno.getTutor() != null ? (ProfessorMapper.toProfessorResponseDto(aluno.getTutor())) : null)
+                .build();
     }
     
     public static List<AlunoResponseDto> toAlunosResponseDto(List<Aluno> alunos) {

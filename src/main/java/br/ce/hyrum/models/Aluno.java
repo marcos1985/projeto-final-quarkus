@@ -33,6 +33,6 @@ public class Aluno extends PanacheEntityBase {
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tutor", unique = true)
+    @JoinColumn(name = "tutor", nullable = true)
     private Professor tutor;
 }

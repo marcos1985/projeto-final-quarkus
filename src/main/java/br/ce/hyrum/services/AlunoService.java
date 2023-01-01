@@ -1,6 +1,7 @@
 package br.ce.hyrum.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -10,6 +11,7 @@ import br.ce.hyrum.dtos.aluno.AlunoRequestDto;
 import br.ce.hyrum.dtos.aluno.AlunoResponseDto;
 import br.ce.hyrum.mappers.AlunoMapper;
 import br.ce.hyrum.models.Aluno;
+import br.ce.hyrum.models.Professor;
 import br.ce.hyrum.repositories.AlunoRepository;
 
 @ApplicationScoped
@@ -49,4 +51,26 @@ public class AlunoService {
         
         alunoRepository.delete(id);
     }
+
+    @Transactional
+    public void setTutor(Long id, Long idProfessor) {
+
+        Optional<Aluno> alunoOptional = Aluno.findByIdOptional(id);
+
+        if (!alunoOptional.isPresent()) {
+            new RuntimeException("Aluno não encontrado.");
+        }
+
+        Optional<Professor> professorOptional = Professor.findByIdOptional(idProfessor);
+
+        if (!professorOptional.isPresent()) {
+            new RuntimeException("Professor não encontrado.");
+        }
+
+        var aluno = alunoOptional.get();
+        var professor = professorOptional.get();
+
+        aluno.setTutor(professor);
+        aluno.persistAndFlush();
+    }   
 }
