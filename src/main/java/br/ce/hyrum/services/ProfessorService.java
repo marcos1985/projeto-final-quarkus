@@ -2,6 +2,7 @@ package br.ce.hyrum.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -17,25 +18,37 @@ import br.ce.hyrum.mappers.ProfessorMapper;
 import br.ce.hyrum.models.Aluno;
 import br.ce.hyrum.models.Professor;
 import br.ce.hyrum.repositories.ProfessorRepository;
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
+@AllArgsConstructor
 public class ProfessorService {
 
-    @Inject
-    ProfessorRepository professorRepository;
+    private ProfessorRepository professorRepository;
 
     @Transactional
     public ProfessorResponseDto save(@Valid ProfessorRequestDto professorRequestDto) {
+        
+        Objects.requireNonNull(professorRequestDto, "Professor obrigatório!");
+        
         Professor professor = ProfessorMapper.fromProfessorRequestDto(professorRequestDto);
-        return ProfessorMapper.toProfessorResponseDto(professorRepository.save(professor));
+
+        professorRepository.persistAndFlush(professor);
+
+        return ProfessorMapper.toProfessorResponseDto(professor);
     }
 
     public List<ProfessorResponseDto> findAll() {
-        return professorRepository.findAll();
+
+        List<Professor> professores = professorRepository.findAll().list();
+
+        return professores.stream()
+                    .map(professor -> ProfessorMapper.toProfessorResponseDto(professor))
+                    .toList();
     }
 
     @Transactional
-    public ProfessorResponseDto update(Long id, ProfessorRequestDto professoreRequestDto) {
+    public ProfessorResponseDto update(Long id, @Valid ProfessorRequestDto professoreRequestDto) {
 
         // Valida se os ids informados são iguais.
         if (!professoreRequestDto.getId().equals(id)) {
@@ -53,8 +66,8 @@ public class ProfessorService {
         professor.setNome(professoreRequestDto.getNome());
         professor.setId(id);
 
-        professor = professorRepository.update(professor);
-
+        professorRepository.persistAndFlush(professor);
+        
         return ProfessorMapper.toProfessorResponseDto(professor);
     }
 

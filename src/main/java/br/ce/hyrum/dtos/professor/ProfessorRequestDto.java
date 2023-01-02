@@ -1,6 +1,6 @@
 package br.ce.hyrum.dtos.professor;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ public class ProfessorRequestDto {
     
     private Long id;
 
-    @NotEmpty(message = "Nome não pode ser vazio")
+    @NotBlank(message = "Nome não pode ser vazio")
     private String nome;
     
 }

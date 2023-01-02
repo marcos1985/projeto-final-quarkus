@@ -10,8 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import lombok.AllArgsConstructor;
@@ -31,8 +30,8 @@ public class Professor extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Nome não pode ser nulo")
-    @NotEmpty(message = "Nome não pode ser vazio")
+    @NotBlank(message = "Nome não pode ser nulo")
+    @Size(min = 4, message = "Minimum name length 4 characters")
     private String nome;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tutor")

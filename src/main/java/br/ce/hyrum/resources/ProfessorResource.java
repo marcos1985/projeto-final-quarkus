@@ -1,5 +1,7 @@
 package br.ce.hyrum.resources;
 
+import javax.persistence.Entity;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -10,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import br.ce.hyrum.dtos.ErrorResponse;
 import br.ce.hyrum.dtos.professor.ProfessorRequestDto;
 import br.ce.hyrum.services.ProfessorService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,17 +28,19 @@ public class ProfessorResource {
     }
 
     @POST
-    public Response create(@Valid ProfessorRequestDto professor) {
+    public Response save(ProfessorRequestDto professor) {
 
         try {
             log.info("Criando um novo professor.");
-            var professorRequestDto = professorService.save(professor);
+            var professorResponseDto = professorService.save(professor);
             return Response.status(Status.CREATED)
-                    .entity(professorRequestDto)
+                    .entity(professorResponseDto)
+  
                     .build();
 
-        } catch(Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
+        } catch(ConstraintViolationException e) {
+            return Response.status(Status.BAD_REQUEST)
+                            .entity(ErrorResponse.createFromValidation(e))
                             .build();
         }
         
@@ -54,13 +59,20 @@ public class ProfessorResource {
 
     @PUT
     @Path("/{id}")
-    public Response atualizar( @PathParam("id") Long id, ProfessorRequestDto professor) {
+    public Response update( @PathParam("id") Long id, ProfessorRequestDto professor) {
 
-        log.info("Atualizando professor de id " + id);
+        try {
+            log.info("Atualizando professor de id " + id);
 
-        return Response.ok()
+            return Response.ok()
                     .entity(professorService.update(id, professor))
                     .build();
+    
+        } catch(ConstraintViolationException e) {
+            return Response.status(Status.BAD_REQUEST)
+                            .entity(ErrorResponse.createFromValidation(e))
+                            .build();
+        }
     }
 
     @DELETE
