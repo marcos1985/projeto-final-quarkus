@@ -22,6 +22,19 @@ public class AlunoService {
     
     private AlunoRepository alunoRepository;
 
+    public AlunoResponseDto findById(Long id) {
+
+        Optional<Aluno> alunoOptional = alunoRepository.findByIdOptional(id);
+
+        if(!alunoOptional.isPresent()) {
+            throw new RuntimeException("Aluno não encontrado.");
+        }
+
+        Aluno aluno = alunoOptional.get();
+
+        return AlunoMapper.toAlunoResponseDto(aluno);
+    }
+
     public List<AlunoResponseDto> findAll() {
 
         List<Aluno> alunos = alunoRepository.findAll().list();

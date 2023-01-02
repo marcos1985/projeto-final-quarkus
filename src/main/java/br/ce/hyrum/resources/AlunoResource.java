@@ -32,6 +32,12 @@ public class AlunoResource {
         return Response.ok(alunoService.findAll()).build();
     }
 
+    @GET
+    @Path("/{id}")
+    public Response findById(@PathParam("id") Long id) {
+        return Response.ok(alunoService.findById(id)).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response save(AlunoRequestDto alunoRequestDto) {
