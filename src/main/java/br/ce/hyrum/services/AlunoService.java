@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import br.ce.hyrum.dtos.aluno.AlunoRequestDto;
 import br.ce.hyrum.dtos.aluno.AlunoResponseDto;
@@ -13,43 +13,69 @@ import br.ce.hyrum.mappers.AlunoMapper;
 import br.ce.hyrum.models.Aluno;
 import br.ce.hyrum.models.Professor;
 import br.ce.hyrum.repositories.AlunoRepository;
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
+@AllArgsConstructor
 public class AlunoService {
 
-    @Inject
-    AlunoRepository alunoRepository;
+    
+    private AlunoRepository alunoRepository;
 
-    public List<AlunoResponseDto> getAlunos() {
-        return AlunoMapper.toAlunosResponseDto(alunoRepository.all());
+    public List<AlunoResponseDto> findAll() {
+
+        List<Aluno> alunos = alunoRepository.findAll().list();
+
+        return alunos.stream()
+                    .map(aluno -> AlunoMapper.toAlunoResponseDto(aluno))
+                    .toList();
     }
 
     @Transactional
-    public AlunoResponseDto save(AlunoRequestDto alunoRequestDto) {
+    public AlunoResponseDto save(@Valid AlunoRequestDto alunoRequestDto) {
 
         // Validação
 
         // Tranforma de DTO de request para a entidade
         Aluno aluno = AlunoMapper.fromAlunoRequestDto(alunoRequestDto);
+        alunoRepository.persistAndFlush(aluno);
 
         // Transforma de entidade para o DTO de response
-        return AlunoMapper.toAlunoResponseDto(alunoRepository.save(aluno));
+        return AlunoMapper.toAlunoResponseDto(aluno);
     }
     
     @Transactional
-    public AlunoResponseDto update(Long id, AlunoRequestDto alunoRequestDto) {
+    public AlunoResponseDto update(Long id, @Valid AlunoRequestDto alunoRequestDto) {
 
-        // Tranforma de DTO de request para a entidade
-        Aluno aluno = AlunoMapper.fromAlunoRequestDto(alunoRequestDto);
+        Optional<Aluno> alunoOptional = alunoRepository.findByIdOptional(id);
 
-        // Transforma de entidade para o DTO de response
-        return AlunoMapper.toAlunoResponseDto(alunoRepository.update(id, aluno));
+        if(!alunoOptional.isPresent()) {
+            throw new RuntimeException("Aluno não encontrado.");
+        }
+
+        Aluno aluno = alunoOptional.get();
+
+        aluno.setNome(alunoRequestDto.getNome());
+        aluno.setEmail(alunoRequestDto.getEmail());
+
+        alunoRepository.persistAndFlush(aluno);
+
+        return AlunoMapper.toAlunoResponseDto(aluno);
+        
     }
 
     @Transactional
     public void delete(Long id) {
         
-        alunoRepository.delete(id);
+        Optional<Aluno> alunoOptional = alunoRepository.findByIdOptional(id);
+
+        if(!alunoOptional.isPresent()) {
+            throw new RuntimeException("Aluno não encontrado.");
+        }
+
+        Aluno aluno = alunoOptional.get();
+
+        alunoRepository.delete(aluno);
     }
 
     @Transactional
@@ -71,6 +97,7 @@ public class AlunoService {
         var professor = professorOptional.get();
 
         aluno.setTutor(professor);
-        aluno.persistAndFlush();
+
+        alunoRepository.persistAndFlush(aluno);
     }   
 }

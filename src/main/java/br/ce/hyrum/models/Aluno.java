@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,10 @@ public class Aluno extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Nome não pode ser vazio.")
     private String nome;
+
+    @NotBlank(message = "Email não pode ser vazio.")
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
