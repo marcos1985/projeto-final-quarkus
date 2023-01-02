@@ -57,6 +57,18 @@ public class ProfessorResource {
 
     }
 
+    @GET
+    @Path("/{id}")
+    public Response findById(@PathParam("id") Long id) {
+
+        log.info("Listando professores.");
+
+        return Response
+                    .ok(professorService.findByID(id))
+                    .build();
+
+    }
+
     @PUT
     @Path("/{id}")
     public Response update( @PathParam("id") Long id, ProfessorRequestDto professor) {

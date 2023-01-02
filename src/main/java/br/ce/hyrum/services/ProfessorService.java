@@ -47,6 +47,19 @@ public class ProfessorService {
                     .toList();
     }
 
+    public ProfessorResponseDto findByID(Long id) {
+
+        Optional<Professor> professorOptional = professorRepository.findByIdOptional(id);
+
+        if(!professorOptional.isPresent()) {
+            throw new RuntimeException("Professor não encontrado.");
+        }
+
+        Professor professor = professorOptional.get();
+
+        return ProfessorMapper.toProfessorResponseDto(professor);
+    }
+
     @Transactional
     public ProfessorResponseDto update(Long id, @Valid ProfessorRequestDto professoreRequestDto) {
 
